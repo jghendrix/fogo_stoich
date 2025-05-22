@@ -1,2 +1,2 @@
-# fogo_stoich
+# stoich
 
