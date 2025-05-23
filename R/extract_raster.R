@@ -2,10 +2,10 @@
 
 extract_raster <- function(DT, crs, r1, r2, r3, r4, r5, r6) {
 
-	sites <- DT %>% filter(!duplicated(paste0(x, y))) %>%
-	  dplyr::select(c(x, y))
+	#sites <- DT %>% filter(!duplicated(paste0(x, y))) %>%
+	 # dplyr::select(c(x, y))
   
-  setDT(sites)
+  sites <- setDT(DT)
 
   pt <- c('x', 'y')
   

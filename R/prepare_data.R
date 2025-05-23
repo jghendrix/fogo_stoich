@@ -3,13 +3,17 @@
 prepare_data <- function(DT, raster) {
 
   raster %<>% 
-    rename(ndvi = 3,
-           elevation = 4,
-           slope_deg = 5,
-           aspect_deg = 6,
-           TPI = 7,
-           rugged = 8) %>%
-    mutate(ndvi = ndvi/10000)
+    rename(ndvi = 5,
+           elevation = 6,
+           slope = 7,
+           aspect = 8,
+           TPI = 9,
+           rugged = 10) %>%
+    mutate(ndvi = ndvi/10000,
+           # Merge rock/rubble into barrens
+           pt_lc = ifelse(pt_lc == "32", "33", pt_lc),
+           lc_description = ifelse(pt_lc == "32" | pt_lc == "33",
+                                   "Barrens", lc_description))
   
   DT1 <- left_join(DT, raster, by = c("x", "y"))
   
@@ -18,13 +22,15 @@ prepare_data <- function(DT, raster) {
   # realized my NC and Dara's CN were getting mixed up
     dplyr::rename(CN_ratio = NC_ratio) %>%
     mutate(site = as.factor(site),
-           lc = as.factor(lc),
+           pt_lc = as.factor(pt_lc),
+           lc_description = as.factor(lc_description),
            species = as.factor(species))
   
   DT1 %<>%
-    group_by(species) %>%
-    mutate(aspect = aspect_deg*pi/180) %>%
-    mutate(aspect = ifelse(is.na(aspect_deg), mean(aspect, na.rm = T), aspect))
+  group_by(species) %>%
+    mutate(aspect = ifelse(is.na(aspect), mean(aspect, na.rm = T), aspect))
+  
+  
   
   return(DT1)  
   

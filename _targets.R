@@ -12,17 +12,20 @@ tar_option_set(format = 'qs')
 # Path to stoich samples data
 stoich_path <- file.path('input', 'cleaned_all_stoich.csv')
 
-# Path to land cover raster
-lc_path <- file.path('input', 'Hermosilla_2022_land_cover.tif')
+# Path to land cover rasters
+# lc = Canadian Forest service, sdss = provincial product
+lc_path <- file.path('input', 'Hermosilla_5m.tif')
+sdss_path <- file.path('input', 'SDSS_5m.tif')
 legend_path <- file.path('input', 'cfs_legend.csv')
+sdss_legend_path <- file.path('input', 'legend_sdss.csv')
 
 # Path to landscape covariates
-dem_path <- file.path('input', 'Fogo_DEM.tif')
-ndvi_path <- file.path('input', 'weekly2022_13-19Jun_NDVI.tif')
-slope_path <- file.path('input', 'Fogo_slope.tif')
-aspect_path <- file.path('input', 'Fogo_aspect.tif')
-TPI_path <- file.path('input', 'Fogo_TPI.tif')
-terrain_path <- file.path('input', 'Fogo_terrain_ruggedness.tif')
+dem_path <- file.path('input', 'dem.tif')
+ndvi_path <- file.path('input', 'ndvi_5m.tif')
+slope_path <- file.path('input', 'slope.tif')
+aspect_path <- file.path('input', 'aspect_rad.tif')
+TPI_path <- file.path('input', 'TPI.tif')
+terrain_path <- file.path('input', 'terrain.tif')
 
 # Variables ---------------------------------------------------------------
 bb <- c(
@@ -66,6 +69,18 @@ targets_data <- c(
 		legend,
 		legend_path,
 		fread(!!.x)
+	),
+	
+	tar_file_read(
+	  sdss,
+	  sdss_path,
+	  raster(!!.x)
+	),
+	
+	tar_file_read(
+	  sdss_legend,
+	  sdss_legend_path,
+	  fread(!!.x)
 	),
 	
 	tar_file_read(
@@ -146,19 +161,30 @@ tar_target(
 ),
 
 tar_target(
-  ndvi_extract,
-  extract_lc(
-    sites_to_roads,
-    crs,
-    ndvi,
-    legend
-  )
+  sdss_sites,
+  extract_lc(sites_to_roads, 
+             crs, 
+             sdss, 
+             sdss_legend)
 ),
+
+tar_target(
+  renamed_sdss,
+  sdss_sites %>% dplyr::rename(pt_sdss = pt_lc, sdss_desc = lc_description)
+),
+
+tar_target(
+  cfs_sites,
+  extract_lc(renamed_sdss, 
+             crs, 
+             lc, 
+             legend)
+  ),
 
 tar_target(
   raster_ext,
   extract_raster(
-    sites_to_roads,
+    cfs_sites,
     crs,
     ndvi,
     dem,
@@ -171,7 +197,7 @@ tar_target(
 
 tar_target(
   data_cleaned,
-  prepare_data(sites_to_roads, raster_ext)
+  prepare_data(stoich, raster_ext)
 )
 )
 
@@ -225,6 +251,17 @@ targets_models <- c(
    pattern = map(CN_models, sp_key)
  )
  
+)
+
+# Targets: predicting N across rest of island
+
+tar_predictions <- c(
+  
+  tar_target(
+   raster_stack,
+    stack_rasters(sdss, lc, ndvi, dem, slope, aspect, TPI, terrain)
+  )
+  
 )
 
 # Targets: all ------------------------------------------------------------
