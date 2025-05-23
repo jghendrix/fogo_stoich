@@ -3,12 +3,12 @@
 prepare_data <- function(DT, raster) {
 
   raster %<>% 
-    rename(ndvi = 5,
-           elevation = 6,
-           slope = 7,
-           aspect = 8,
-           TPI = 9,
-           rugged = 10) %>%
+    rename(ndvi = 9,
+           elevation = 10,
+           slope = 11,
+           aspect = 12,
+           TPI = 13,
+           rugged = 14) %>%
     mutate(ndvi = ndvi/10000,
            # Merge rock/rubble into barrens
            pt_lc = ifelse(pt_lc == "32", "33", pt_lc),
@@ -24,6 +24,8 @@ prepare_data <- function(DT, raster) {
     mutate(site = as.factor(site),
            pt_lc = as.factor(pt_lc),
            lc_description = as.factor(lc_description),
+           pt_sdss = as.factor(pt_sdss),
+           sdss_desc = as.factor(sdss_desc),
            species = as.factor(species))
   
   DT1 %<>%

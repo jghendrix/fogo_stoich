@@ -2,7 +2,7 @@
 
 extract_lc <- function(DT, crs, lc, legend) {
 
-    setDT(sites)
+  sites <- setDT(DT)
 
   pt <- c('x', 'y')
   

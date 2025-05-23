@@ -14,8 +14,8 @@ stoich_path <- file.path('input', 'cleaned_all_stoich.csv')
 
 # Path to land cover rasters
 # lc = Canadian Forest service, sdss = provincial product
-lc_path <- file.path('input', 'Hermosilla_5m.tif')
-sdss_path <- file.path('input', 'SDSS_5m.tif')
+lc_path <- file.path('input', 'CFS_5m.tif')
+sdss_path <- file.path('input', 'SDSS_of_Fogo-5m.tif')
 legend_path <- file.path('input', 'cfs_legend.csv')
 sdss_legend_path <- file.path('input', 'legend_sdss.csv')
 
@@ -138,9 +138,16 @@ targets_data <- c(
 targets_extract <- c(
 
 tar_target(
+    sites,
+    unique_sites(
+      stoich
+      )
+    ),
+
+tar_target(
 	sites_to_coast,
 	dist_to_feature(
-		stoich,
+		sites,
 		crs,
 		coast
 	)
@@ -250,20 +257,29 @@ targets_models <- c(
    output_by_sp(CN_models, sp_key),
    pattern = map(CN_models, sp_key)
  )
- 
 )
 
-# Targets: predicting N across rest of island
-
-tar_predictions <- c(
+# Targets: predicting N across rest of island ---------------------------
+targets_predict <- c(
   
   tar_target(
-   raster_stack,
-    stack_rasters(sdss, lc, ndvi, dem, slope, aspect, TPI, terrain)
+    raster_stack,
+    stack_rasters(sdss, 
+                  lc, 
+                  ndvi, 
+                  dem, 
+                  slope, 
+                  aspect, 
+                  TPI,
+                  terrain)
+  ),
+  
+  tar_target(
+    spp_dist,
+    habitat_by_sp(data_cleaned)
   )
   
 )
-
 # Targets: all ------------------------------------------------------------
 # Automatically grab and combine all the "targets_*" lists above
 lapply(grep('targets', ls(), value = TRUE), get)
