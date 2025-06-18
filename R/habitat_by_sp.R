@@ -53,10 +53,10 @@ habitat_by_sp <- function(DT) {
   permute <- left_join(permute, hab_sampled, by = c("SDSS", "CFS")) %>%
     mutate(seen = ifelse(is.na(seen), "no", "yes"))
   
-  ggplot(subset(presence, species == "Kalmia"),
+  ggplot(subset(presence, species == "Alder"),
          aes(x = SDSS, y = CFS, size = n)) +
     geom_point() +
     geom_point(data = subset(permute, seen == "no"), aes(x = SDSS, y = CFS), colour = "red", shape = 4, size = 4, show.legend = FALSE) +
-    ggtitle("Kalmia occurrence") +
+    ggtitle("Alder occurrence") +
     theme_bw()
   }

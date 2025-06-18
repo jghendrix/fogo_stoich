@@ -27,6 +27,9 @@ aspect_path <- file.path('input', 'aspect_rad.tif')
 TPI_path <- file.path('input', 'TPI.tif')
 terrain_path <- file.path('input', 'terrain.tif')
 
+# rasterized distance to coast
+dist_to_coast_path <- file.path('input', 'dist_to_coast_4999.tif')
+
 # Variables ---------------------------------------------------------------
 bb <- c(
 	xmin = -54.3533,
@@ -261,6 +264,12 @@ targets_models <- c(
 
 # Targets: predicting N across rest of island ---------------------------
 targets_predict <- c(
+
+  tar_file_read(
+    dist_coast,
+    dist_to_coast_path,
+    raster(!!.x)
+  ),
   
   tar_target(
     raster_stack,
@@ -271,13 +280,16 @@ targets_predict <- c(
                   slope, 
                   aspect, 
                   TPI,
-                  terrain)
+                  terrain,
+                  dist_coast)
   ),
   
   tar_target(
     spp_dist,
     habitat_by_sp(data_cleaned)
   )
+  
+  ## Spatial prediction from model using the stacked rasters??
   
 )
 # Targets: all ------------------------------------------------------------
