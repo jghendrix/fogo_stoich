@@ -43,11 +43,10 @@ stack_rasters <- function(r1, sdss_legend, r2, cfs_legend, r3, r4, r5, r6, r7, r
   pred_df %<>% rename(`percent N` = lyr1)
 
   ggplot(pred_df) +
+   # geom_sf(data = coast) +
     geom_raster(aes(x = x, y = y, fill = `percent N`)) +
-    geom_polygon(data = coast, aes(x = x, y = y)) +
     coord_cartesian(ylim = c(5505000, 5515000)) +
     scale_fill_viridis(option = "B", discrete = FALSE) +
-    theme_bw() #+
-    theme(legend.title = "Percent N")
+    theme_bw()
 
 }
