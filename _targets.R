@@ -14,21 +14,21 @@ stoich_path <- file.path('input', 'cleaned_all_stoich.csv')
 
 # Path to land cover rasters
 # lc = Canadian Forest service, sdss = provincial product
-lc_path <- file.path('input', 'CFS_5m.tif')
-sdss_path <- file.path('input', 'SDSS_of_Fogo-5m.tif')
+cfs_path <- file.path('input', 'cfs.tif')
+sdss_path <- file.path('input', 'sdss.tif')
 legend_path <- file.path('input', 'cfs_legend.csv')
-sdss_legend_path <- file.path('input', 'legend_sdss.csv')
+sdss_legend_path <- file.path('input', 'trimmed_legend_sdss.csv')
 
 # Path to landscape covariates
 dem_path <- file.path('input', 'dem.tif')
-ndvi_path <- file.path('input', 'ndvi_5m.tif')
+ndvi_path <- file.path('input', 'ndvi.tif')
 slope_path <- file.path('input', 'slope.tif')
-aspect_path <- file.path('input', 'aspect_rad.tif')
+aspect_path <- file.path('input', 'aspect.tif')
 TPI_path <- file.path('input', 'TPI.tif')
 terrain_path <- file.path('input', 'terrain.tif')
 
 # rasterized distance to coast
-dist_to_coast_path <- file.path('input', 'dist_to_coast_4999.tif')
+dist_to_coast_path <- file.path('input', 'dist_to_coast.tif')
 
 # Variables ---------------------------------------------------------------
 bb <- c(
@@ -63,13 +63,13 @@ targets_data <- c(
 	),
 
 	tar_file_read(
-		lc,
-		lc_path,
+		cfs,
+		cfs_path,
 		raster(!!.x)
 	),
 
 	tar_file_read(
-		legend,
+		cfs_legend,
 		legend_path,
 		fread(!!.x)
 	),
@@ -266,7 +266,7 @@ targets_models <- c(
 targets_predict <- c(
 
   tar_file_read(
-    dist_coast,
+    dist_to_coast,
     dist_to_coast_path,
     raster(!!.x)
   ),
@@ -274,14 +274,14 @@ targets_predict <- c(
   tar_target(
     raster_stack,
     stack_rasters(sdss, 
-                  lc, 
+                  cfs, 
                   ndvi, 
                   dem, 
                   slope, 
                   aspect, 
                   TPI,
                   terrain,
-                  dist_coast)
+                  dist_to_coast)
   ),
   
   tar_target(

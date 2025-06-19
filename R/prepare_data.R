@@ -4,7 +4,7 @@ prepare_data <- function(DT, raster) {
 
   raster %<>% 
     rename(ndvi = 9,
-           elevation = 10,
+           dem = 10,
            slope = 11,
            aspect = 12,
            TPI = 13,
