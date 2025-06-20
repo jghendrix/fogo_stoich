@@ -180,21 +180,26 @@ tar_target(
 
 tar_target(
   renamed_sdss,
-  sdss_sites %>% dplyr::rename(pt_sdss = pt_lc, sdss_desc = lc_description)
+  sdss_sites %>% dplyr::rename(sdss_number = pt_lc, sdss_lc = lc_description)
 ),
 
 tar_target(
   cfs_sites,
   extract_lc(renamed_sdss, 
              crs, 
-             lc, 
-             legend)
+             cfs, 
+             cfs_legend)
   ),
+
+tar_target(
+  renamed_cfs,
+  cfs_sites %>% dplyr::rename(cfs_number = pt_lc, cfs_lc = lc_description)
+),
 
 tar_target(
   raster_ext,
   extract_raster(
-    cfs_sites,
+    renamed_cfs,
     crs,
     ndvi,
     dem,
@@ -272,17 +277,27 @@ targets_predict <- c(
   ),
   
   tar_target(
-    raster_stack,
-    stack_rasters(sdss, 
+    N_predictions,
+    predicted_map(sp_prep,
+                  sp_key,
+                  sdss, 
+                  sdss_legend,
                   cfs, 
+                  cfs_legend,
                   ndvi, 
                   dem, 
                   slope, 
                   aspect, 
                   TPI,
                   terrain,
-                  dist_to_coast)
+                  dist_to_coast),
+  pattern = map(sp_prep, sp_key)
   ),
+  
+    tar_target(
+      N_by_cell,
+      predictions_by_cell(N_predictions)
+    ),
   
   tar_target(
     spp_dist,
