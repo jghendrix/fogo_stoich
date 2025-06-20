@@ -26,6 +26,7 @@ slope_path <- file.path('input', 'slope.tif')
 aspect_path <- file.path('input', 'aspect.tif')
 TPI_path <- file.path('input', 'TPI.tif')
 terrain_path <- file.path('input', 'terrain.tif')
+kernel_path <- file.path('input', 'kernel.tif')
 
 # rasterized distance to coast
 dist_to_coast_path <- file.path('input', 'dist_to_coast.tif')
@@ -116,6 +117,11 @@ targets_data <- c(
 	tar_file_read(
 	  terrain,
 	  terrain_path,
+	  raster(!!.x)
+	),
+	tar_file_read(
+	  kernel,
+	  kernel_path,
 	  raster(!!.x)
 	),
 	
@@ -211,8 +217,16 @@ tar_target(
 ),
 
 tar_target(
+  kerneled,
+  extract_kernel(
+    raster_ext,
+    crs,
+    kernel)
+),
+
+tar_target(
   data_cleaned,
-  prepare_data(stoich, raster_ext)
+  prepare_data(stoich, kerneled)
 )
 )
 
