@@ -9,3 +9,7 @@ modelling <- function(DT, response) {
                              dem + slope + cos(aspect) + TPI + terrain + pt_kernel")), 
               data = DT)
 }
+
+# adding count of caribou fixes in 25m x 25m cell does not do anything explanatory in the model
+# this is all caribou fixes ever, though... perhaps if restricted to just winter, a different story?
+# or can we calculate an intensity of use that isn't quite so zero-centred?
