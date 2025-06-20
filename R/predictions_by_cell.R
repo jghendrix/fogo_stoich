@@ -5,15 +5,15 @@ predictions_by_cell <- function(df){
   # so this is my very inefficient workaround
   
   df1 <- df %>% group_by(x,y) %>%
-  summarise(N_crowberry = mean(3, na.rm = T),
-            N_Kalmia = mean(4, na.rm = T),
-            N_lingonberry = mean(5, na.rm = T),
-            N_Cladonia = mean(6, na.rm = T),
-            N_blueberry = mean(7, na.rm = T),
-            N_alder = mean(8, na.rm = T),
-            N_dwarf_birch = mean(9, na.rm = T),
-            N_deergrass = mean(10, na.rm = T),
-            N_graminoid_spp = mean(11, na.rm = T),
-            N_black_spruce = mean(12, na.rm = T))
+  summarise(N_crowberry = mean(`Percent_N_ Crowberry`, na.rm = T),
+            N_Kalmia = mean(`Percent_N_ Kalmia`, na.rm = T),
+            N_lingonberry = mean(`Percent_N_ Lingonberry`, na.rm = T),
+            N_Cladonia = mean(`Percent_N_ Cladonia`, na.rm = T),
+            N_blueberry = mean(`Percent_N_ Blueberry`, na.rm = T),
+            N_alder = mean(`Percent_N_ Alder`, na.rm = T),
+            N_dwarf_birch = mean(`Percent_N_ Dwarf_birch`, na.rm = T),
+            N_deergrass = mean(`Percent_N_ Deergrass`, na.rm = T),
+            N_graminoid_spp = mean(`Percent_N_ graminoid_spp.`, na.rm = T),
+            N_black_spruce = mean(`Percent_N_ Black_spruce`, na.rm = T))
 
 }

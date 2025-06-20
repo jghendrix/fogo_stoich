@@ -55,7 +55,8 @@ predicted_map <- function(df, sp_key, r1, sdss_legend, r2, cfs_legend, r3, r4, r
   r_pred <- terra::predict(layers, mod, na.rm = TRUE)
   
     pred_df <- as.data.frame(r_pred, xy = TRUE) %>%
-    rename(Percent_N = lyr1)
+    rename(Percent_N = lyr1) %>%
+      mutate(Percent_N = ifelse(Percent_N < 0, 0, Percent_N))
   
  g <- ggplot(pred_df) +
    # geom_sf(data = coast) +
@@ -67,7 +68,7 @@ predicted_map <- function(df, sp_key, r1, sdss_legend, r2, cfs_legend, r3, r4, r
     ggtitle(paste0("Predicted %N for ", sp_key$species)) +
     theme_bw() 
 
-  ggsave(paste0('graphics/predicted_N_', sp_key$species, '.png'),
+  ggsave(paste0('graphics/zero_censored_predicted_N_', sp_key$species, '.png'),
                 g,
                 height = 6,
                 width = 12)

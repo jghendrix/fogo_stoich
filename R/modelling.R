@@ -5,7 +5,7 @@ modelling <- function(DT, response) {
   DT %<>% filter(species != "Moss")
   
   mod <- lm(as.formula(paste(response, 
-                               "~ pt_lc + pt_sdss + dist_to_coast + ndvi +
-                             dem + slope + cos(aspect) + TPI + rugged")), 
+                               "~ sdss_lc + cfs_lc + dist_to_coast + ndvi +
+                             dem + slope + cos(aspect) + TPI + terrain")), 
               data = DT)
 }
