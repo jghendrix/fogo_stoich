@@ -11,6 +11,7 @@ tar_option_set(format = 'qs')
 # Data --------------------------------------------------------------------
 # Path to stoich samples data
 stoich_path <- file.path('input', 'cleaned_all_stoich.csv')
+winter_path <- file.path('input', 'winter_2025_prepped.csv')
 
 # Path to land cover rasters
 # lc = Canadian Forest service, sdss = provincial product
@@ -62,7 +63,13 @@ targets_data <- c(
 		stoich_path,
 		fread(!!.x)
 	),
-
+	
+	tar_file_read(
+	  winter,
+	  winter_path,
+	  fread(!!.x)
+	),
+	
 	tar_file_read(
 		cfs,
 		cfs_path,
@@ -316,6 +323,11 @@ targets_predict <- c(
   tar_target(
     spp_dist,
     habitat_by_sp(data_cleaned)
+  ),
+  
+  tar_target(
+    seasonal_scatter,
+    scatter_CN(sp_prep, winter)
   )
   
   ## Spatial prediction from model using the stacked rasters??

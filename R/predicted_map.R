@@ -56,7 +56,11 @@ predicted_map <- function(df, sp_key, r1, sdss_legend, r2, cfs_legend, r3, r4, r
   
     pred_df <- as.data.frame(r_pred, xy = TRUE) %>%
     rename(Percent_N = lyr1) %>%
-      mutate(Percent_N = ifelse(Percent_N < 0, 0, Percent_N))
+### INTERIM SOLUTION TO OUTLIER N VALUES
+      # highest observed %N was 5.66 for alder
+      # set 6 as the maximum value, and 0 as the minimum
+      mutate(Percent_N = ifelse(Percent_N < 0, 0, Percent_N),
+             Percent_N = ifelse(Percent_N > 6, 6, Percent_N))
   
  g <- ggplot(pred_df) +
    # geom_sf(data = coast) +
@@ -68,10 +72,10 @@ predicted_map <- function(df, sp_key, r1, sdss_legend, r2, cfs_legend, r3, r4, r
     ggtitle(paste0("Predicted %N for ", sp_key$species)) +
     theme_bw() 
 
-  ggsave(paste0('graphics/zero_censored_predicted_N_', sp_key$species, '.png'),
+  ggsave(paste0('graphics/restricted_predicted_N_', sp_key$species, '.png'),
                 g,
-                height = 6,
-                width = 12)
+                height = 4,
+                width = 10)
   # some plants have negative predicted %N... do we just reset those to 0?
   
   pred_df %<>%
@@ -80,3 +84,4 @@ predicted_map <- function(df, sp_key, r1, sdss_legend, r2, cfs_legend, r3, r4, r
   
   return(pred_df)
 }
+
