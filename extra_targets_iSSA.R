@@ -3,38 +3,6 @@
 # 3 March 2025
 
 # Targets: prep -----------------------------------------------------------
-targets_prep <- c(
-  tar_target(
-    locs_prep,
-    prepare_locs(locs_raw, id_col, datetime_col, tz, x_col, y_col, split_by),
-    iteration = 'group'
-  ),
-  
-  tar_target(
-    split_key,
-    unique(locs_prep[, .SD, .SDcols = c(split_by, 'tar_group')])
-  ),
-  tar_target(
-    burn_prep,
-    prepare_burn(burn, crs, drop_z = TRUE)
-  ),
-  
-  tar_target(
-    old_burn,
-    split_burn(burn_prep, "old")
-  ),
-  tar_target(
-    new_burn,
-    split_burn(burn_prep, "new")
-  ),
-  
-  tar_target(
-    locs_nn,
-    nn(locs_prep)
-  )
-)
-
-
 
 targets_extract <- c(
   tar_target(
