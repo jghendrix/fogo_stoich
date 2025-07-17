@@ -11,6 +11,7 @@ tar_option_set(format = 'qs')
 # Data --------------------------------------------------------------------
 # Path to stoich samples data
 stoich_path <- file.path('input', 'cleaned_all_stoich.csv')
+winter_path <- file.path('input', 'winter_2025_prepped.csv')
 
 # Path to land cover rasters
 # lc = Canadian Forest service, sdss = provincial product
@@ -26,6 +27,7 @@ slope_path <- file.path('input', 'slope.tif')
 aspect_path <- file.path('input', 'aspect.tif')
 TPI_path <- file.path('input', 'TPI.tif')
 terrain_path <- file.path('input', 'terrain.tif')
+kernel_path <- file.path('input', 'kernel.tif')
 
 # rasterized distance to coast
 dist_to_coast_path <- file.path('input', 'dist_to_coast.tif')
@@ -74,7 +76,13 @@ targets_data <- c(
 		stoich_path,
 		fread(!!.x)
 	),
-
+	
+	tar_file_read(
+	  winter,
+	  winter_path,
+	  fread(!!.x)
+	),
+	
 	tar_file_read(
 	  caribou,
 	  gps_path,
@@ -165,6 +173,11 @@ targets_data <- c(
 	tar_file_read(
 	  terrain,
 	  terrain_path,
+	  raster(!!.x)
+	),
+	tar_file_read(
+	  kernel,
+	  kernel_path,
 	  raster(!!.x)
 	),
 	
@@ -260,8 +273,16 @@ tar_target(
 ),
 
 tar_target(
+  kerneled,
+  extract_kernel(
+    raster_ext,
+    crs,
+    kernel)
+),
+
+tar_target(
   data_cleaned,
-  prepare_data(stoich, raster_ext)
+  prepare_data(stoich, kerneled)
 )
 )
 
@@ -347,18 +368,7 @@ targets_predict <- c(
 #      N_by_cell,
 #      predictions_by_cell(N_predictions)
 #    ),
-  
-<<<<<<< Updated upstream
-<<<<<<< Updated upstream
-<<<<<<< Updated upstream
-  tar_target(
-    spp_dist,
-    habitat_by_sp(data_cleaned)
-=======
-=======
->>>>>>> Stashed changes
-=======
->>>>>>> Stashed changes
+
 #  tar_target(
 #    spp_dist,
 #    habitat_by_sp(data_cleaned)
@@ -367,14 +377,7 @@ targets_predict <- c(
  # tar_target(
 #    seasonal_scatter,
 #    scatter_CN(sp_prep, winter)
-<<<<<<< Updated upstream
-<<<<<<< Updated upstream
->>>>>>> Stashed changes
-=======
->>>>>>> Stashed changes
-=======
->>>>>>> Stashed changes
-  )
+ )
   
   
 )
