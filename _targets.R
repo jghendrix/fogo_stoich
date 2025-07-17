@@ -30,6 +30,10 @@ terrain_path <- file.path('input', 'terrain.tif')
 # rasterized distance to coast
 dist_to_coast_path <- file.path('input', 'dist_to_coast.tif')
 
+# Caribou data path
+gps_path <- file.path('output', 'all_Fogo_caribou_locs_20June2025.csv')
+id_path <- file.path('output', 'collar-animal-ids.csv')
+
 # Variables ---------------------------------------------------------------
 bb <- c(
 	xmin = -54.3533,
@@ -44,15 +48,24 @@ crs_sp <- CRS(crs$wkt)
 
 
 id_col <- 'Animal_ID'
-datetime_col <- 'DATETIME'
-x_col <- 'Longitude'
-y_col <- 'Lat'
+datetime_col <- 'datetime'
+x_col <- 'x_long'
+y_col <- 'y_lat'
 tz <- 'America/St_Johns'
 
 # Split by: within which column or set of columns (eg. c(id, yr))
 #  do we want to split our analysis?
 split_by <- id_col
 seasonal_split <- "season"
+
+# For iSSA tracks:
+# Resampling rate
+rate <- minutes(120)
+# Tolerance
+tolerance <- minutes(5)
+# Number of random steps
+n_random_steps <- 10
+
 
 # Targets: data -----------------------------------------------------------
 targets_data <- c(
@@ -62,6 +75,18 @@ targets_data <- c(
 		fread(!!.x)
 	),
 
+	tar_file_read(
+	  caribou,
+	  gps_path,
+	  fread(!!.x)
+	),
+	
+	tar_file_read(
+	  ids,
+	  id_path,
+	  fread(!!.x)
+	),
+	
 	tar_file_read(
 		cfs,
 		cfs_path,
@@ -292,21 +317,72 @@ targets_predict <- c(
                   terrain,
                   dist_to_coast),
   pattern = map(sp_prep, sp_key)
-  ),
+#  ),
   
-    tar_target(
-      N_by_cell,
-      predictions_by_cell(N_predictions)
-    ),
+#    tar_target(
+#      N_by_cell,
+#      predictions_by_cell(N_predictions)
+#    ),
   
+<<<<<<< Updated upstream
   tar_target(
     spp_dist,
     habitat_by_sp(data_cleaned)
+=======
+#  tar_target(
+#    spp_dist,
+#    habitat_by_sp(data_cleaned)
+#  ),
+  
+ # tar_target(
+#    seasonal_scatter,
+#    scatter_CN(sp_prep, winter)
+>>>>>>> Stashed changes
   )
   
-  ## Spatial prediction from model using the stacked rasters??
   
 )
+
+# Targets: bringing in caribou movement data ---------------------------
+targets_prep <- c(
+  
+  tar_target(
+    tidy_GPS,
+    GPS_tidying(caribou, ids)
+  ),
+  tar_target(
+    locs_prep,
+    prepare_locs(tidy_GPS, id_col, datetime_col, tz, x_col, y_col, split_by),
+    iteration = 'group'
+  ),
+  tar_target(
+    split_key,
+    unique(locs_prep[, .SD, .SDcols = c(split_by, 'tar_group')])
+  )
+  
+)
+
+# Targets: tracks ---------------------------------------------------------
+targets_tracks <- c(
+  tar_target(
+    tracks,
+    make_track(locs_prep, x_, y_, t_, all_cols = TRUE, crs = 4326) |>
+      transform_coords(crs_to = crs),
+    pattern = map(locs_prep)
+  ),
+  tar_target(
+    tracks_resampled,
+    resample_tracks(tracks, rate = rate, tolerance = tolerance),
+    pattern = map(tracks)
+  ),
+  tar_target(
+    tracks_random,
+    random_steps(tracks_resampled, n = n_random_steps),
+    pattern = map(tracks_resampled)
+  )
+)
+
+
 # Targets: all ------------------------------------------------------------
 # Automatically grab and combine all the "targets_*" lists above
 lapply(grep('targets', ls(), value = TRUE), get)
