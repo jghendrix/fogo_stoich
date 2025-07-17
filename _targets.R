@@ -100,6 +100,18 @@ targets_data <- c(
 	),
 	
 	tar_file_read(
+	  caribou,
+	  gps_path,
+	  fread(!!.x)
+	),
+	
+	tar_file_read(
+	  ids,
+	  id_path,
+	  fread(!!.x)
+	),
+	
+	tar_file_read(
 		cfs,
 		cfs_path,
 		raster(!!.x)
@@ -338,10 +350,13 @@ targets_predict <- c(
   
 <<<<<<< Updated upstream
 <<<<<<< Updated upstream
+<<<<<<< Updated upstream
   tar_target(
     spp_dist,
     habitat_by_sp(data_cleaned)
 =======
+=======
+>>>>>>> Stashed changes
 =======
 >>>>>>> Stashed changes
 #  tar_target(
@@ -353,6 +368,9 @@ targets_predict <- c(
 #    seasonal_scatter,
 #    scatter_CN(sp_prep, winter)
 <<<<<<< Updated upstream
+<<<<<<< Updated upstream
+>>>>>>> Stashed changes
+=======
 >>>>>>> Stashed changes
 =======
 >>>>>>> Stashed changes
