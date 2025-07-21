@@ -14,6 +14,7 @@ GPS_tidying <- function(DT, ids) {
   omits <- df %>% filter(id %in% c("88164", "88169") & idate < "2023-04-10")
   
   df %<>% filter(!V1 %in% c(omits$V1)) %>%
-    dplyr::select(-c(1:2))
+    dplyr::select(-c(1:2)) %>%
+    mutate(idate = lubridate::as_date(idate))
   
 }

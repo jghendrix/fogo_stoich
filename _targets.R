@@ -96,30 +96,6 @@ targets_data <- c(
 	),
 	
 	tar_file_read(
-	  caribou,
-	  gps_path,
-	  fread(!!.x)
-	),
-	
-	tar_file_read(
-	  ids,
-	  id_path,
-	  fread(!!.x)
-	),
-	
-	tar_file_read(
-	  caribou,
-	  gps_path,
-	  fread(!!.x)
-	),
-	
-	tar_file_read(
-	  ids,
-	  id_path,
-	  fread(!!.x)
-	),
-	
-	tar_file_read(
 		cfs,
 		cfs_path,
 		raster(!!.x)
@@ -420,8 +396,19 @@ targets_tracks <- c(
     pattern = map(tracks_resampled)
   )
 )
+## Extracting data for tracks ----
 
-
+targets_extract <- c(
+  tar_target(
+    tracks_extract,
+    extract_layers(
+      tracks_random,
+      crs,
+      lc,
+      legend
+    )
+  )
+)
 # Targets: all ------------------------------------------------------------
 # Automatically grab and combine all the "targets_*" lists above
 lapply(grep('targets', ls(), value = TRUE), get)

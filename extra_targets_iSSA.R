@@ -4,17 +4,7 @@
 
 # Targets: prep -----------------------------------------------------------
 
-targets_extract <- c(
-  tar_target(
-    tracks_extract,
-    extract_layers(
-      tracks_random,
-      crs,
-      lc,
-      legend,
-      burn_prep
-    )
-  ),
+
   
   tar_target(
     tracks_buffer,
