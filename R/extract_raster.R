@@ -1,4 +1,4 @@
-## Extracting land cover of given point
+## Extracting raster value of given point
 
 extract_raster <- function(DT, crs, r1, r2, r3, r4, r5, r6) {
 

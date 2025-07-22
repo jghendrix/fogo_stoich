@@ -396,7 +396,7 @@ targets_tracks <- c(
     pattern = map(tracks_resampled)
   )
 )
-## Extracting data for tracks ----
+## Extracting data for tracks ------------------------------
 
 targets_extract <- c(
   tar_target(
@@ -404,11 +404,18 @@ targets_extract <- c(
     extract_layers(
       tracks_random,
       crs,
-      lc,
-      legend
+      cfs,
+      cfs_legend
     )
   )
-)
+
+  # Which layers do we really want as predictive surfaces for the iSSA?
+  ## lichen stoich
+  ## average vascular stoich?
+  ## average of which species? how to account for the negative/outrageous values? do we need to improve the distribution-by-spp first?
+  
+  
+  )
 # Targets: all ------------------------------------------------------------
 # Automatically grab and combine all the "targets_*" lists above
 lapply(grep('targets', ls(), value = TRUE), get)
