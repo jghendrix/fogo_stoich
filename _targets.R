@@ -346,8 +346,8 @@ targets_predict <- c(
     ),
   
   tar_target(
-    stoich_clean,
-    tidy_stoich(N_by_celldata_cleaned)
+    spp_dist,
+    habitat_by_sp(data_cleaned)
 #  ),
   
  # tar_target(

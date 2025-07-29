@@ -46,7 +46,11 @@ predicted_map <- function(df, sp_key, r1, sdss_legend, r2, cfs_legend, r3, r4, r
   
   # use this stack with our model
   
-  mod <- lm(percent_N ~ sdss_lc + cfs_lc + dist_to_coast + ndvi +
+  # Explanatory model: PROPORTION DATA ------
+  
+  df %<>% mutate(N = percent_N/100)
+  
+  mod <- betareg(N ~ sdss_lc + cfs_lc + dist_to_coast + ndvi +
                dem + slope + cos(aspect) + TPI + terrain, 
              data = df)
   
@@ -55,17 +59,12 @@ predicted_map <- function(df, sp_key, r1, sdss_legend, r2, cfs_legend, r3, r4, r
   r_pred <- terra::predict(layers, mod, na.rm = TRUE)
   
     pred_df <- as.data.frame(r_pred, xy = TRUE) %>%
-    rename(Percent_N = lyr1) %>%
+     mutate(percent_N = 100*lyr1) %>%
+      dplyr::select(-c(lyr1))
       
-### INTERIM SOLUTION TO OUTLIER N VALUES ----
-      # highest observed %N was 5.66 for alder
-      # set 6 as the maximum value, and 0 as the minimum
-      mutate(Percent_N = ifelse(Percent_N < 0, 0, Percent_N),
-             Percent_N = ifelse(Percent_N > 6, 6, Percent_N))
-  
  g <- ggplot(pred_df) +
    # geom_sf(data = coast) +
-    geom_raster(aes(x = x, y = y, fill = Percent_N)) +
+    geom_raster(aes(x = x, y = y, fill = percent_N)) +
     coord_cartesian(ylim = c(5505000, 5515000)) +
     xlab("") +
     ylab("") +
@@ -73,14 +72,14 @@ predicted_map <- function(df, sp_key, r1, sdss_legend, r2, cfs_legend, r3, r4, r
     ggtitle(paste0("Predicted %N for ", sp_key$species)) +
     theme_bw() 
 
-  ggsave(paste0('graphics/restricted_predicted_N_', sp_key$species, '.png'),
+  ggsave(paste0('graphics/betareg_N_', sp_key$species, '.png'),
                 g,
                 height = 4,
                 width = 10)
   
   pred_df %<>%
-    rename_with(~paste("Percent_N_", sp_key$species),
-                .cols = Percent_N)
+    rename_with(~paste("percent_N_", sp_key$species),
+                .cols = percent_N)
   
   return(pred_df)
 }
