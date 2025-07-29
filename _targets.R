@@ -175,8 +175,8 @@ targets_data <- c(
 
 
 
-# Targets: extract --------------------------------------------------------
-targets_extract <- c(
+# Targets: collect stoich predictors --------------------------------------------------------
+targets_collect <- c(
 
 tar_target(
     sites,
@@ -338,16 +338,16 @@ targets_predict <- c(
                   terrain,
                   dist_to_coast),
   pattern = map(sp_prep, sp_key)
-#  ),
+  ),
   
-#    tar_target(
-#      N_by_cell,
-#      predictions_by_cell(N_predictions)
-#    ),
-
-#  tar_target(
-#    spp_dist,
-#    habitat_by_sp(data_cleaned)
+  tar_target(
+      N_by_cell,
+      predictions_by_cell(N_predictions)
+    ),
+  
+  tar_target(
+    stoich_clean,
+    tidy_stoich(N_by_celldata_cleaned)
 #  ),
   
  # tar_target(
@@ -406,6 +406,15 @@ targets_extract <- c(
       crs,
       cfs,
       cfs_legend
+    )
+  ),
+  
+  tar_target(
+    tracks_stoich,
+    extract_stoich(
+      tracks_extract,
+      crs,
+      N_predictions
     )
   )
 
