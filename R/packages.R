@@ -23,6 +23,7 @@ library(distanceto)
 #library(spatsoc)
 
 library(glmmTMB)
+require(betareg)
 require(broom.mixed)
 require(tidyr)
 require(dplyr)
