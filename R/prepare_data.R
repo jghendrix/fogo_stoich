@@ -29,7 +29,8 @@ prepare_data <- function(DT, raster) {
   
   DT1 %<>%
   group_by(species) %>%
-    mutate(aspect = ifelse(is.na(aspect), mean(aspect, na.rm = T), aspect))
+    mutate(aspect = ifelse(is.na(aspect), mean(aspect, na.rm = T), aspect),
+           date = lubridate::as_date(date))
   
   
   

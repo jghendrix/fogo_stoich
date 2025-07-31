@@ -268,7 +268,11 @@ targets_models <- c(
   
   tar_target(
     sp_prep,
-    as.data.table(subset(data_cleaned, species != "Moss"))[, tar_group := .GRP, by = c('species')], iteration = 'group'
+    as.data.table(subset(data_cleaned, species != "Moss" &
+                                       species != "Black_spruce" &
+                                       species != "graminoid_spp." &
+                                       species != "Dwarf_birch"))
+    [, tar_group := .GRP, by = c('species')], iteration = 'group'
     ),
     
     tar_target(
@@ -321,11 +325,13 @@ targets_predict <- c(
     dist_to_coast_path,
     raster(!!.x)
   ),
+  # We can't apply the same predictive model to graminoid or birch, it breaks
+  # separate these out and run separately?
   
   tar_target(
     N_predictions,
     predicted_map(sp_prep,
-                  sp_key,
+                  sp_key, 
                   sdss, 
                   sdss_legend,
                   cfs, 
@@ -341,8 +347,50 @@ targets_predict <- c(
   ),
   
   tar_target(
+    gram_prep,
+    as.data.table(subset(data_cleaned, species == "graminoid_spp."))
+  ),
+  
+  tar_target(
+    birch_prep,
+    as.data.table(subset(data_cleaned, species == "Dwarf_birch"))
+  ),
+  
+  tar_target(
+    N_birch,
+    predicted_single(birch_prep,
+                  sdss, 
+                  sdss_legend,
+                  cfs, 
+                  cfs_legend,
+                  ndvi, 
+                  dem, 
+                  slope, 
+                  aspect, 
+                  TPI,
+                  terrain,
+                  dist_to_coast)
+  ),
+  
+  tar_target(
+    N_gram,
+    predicted_single(gram_prep,
+                     sdss, 
+                     sdss_legend,
+                     cfs, 
+                     cfs_legend,
+                     ndvi, 
+                     dem, 
+                     slope, 
+                     aspect, 
+                     TPI,
+                     terrain,
+                     dist_to_coast)
+  ),
+  
+  tar_target(
       N_by_cell,
-      predictions_by_cell(N_predictions)
+      predictions_by_cell(N_predictions, N_birch, N_gram)
     ),
   
   tar_target(

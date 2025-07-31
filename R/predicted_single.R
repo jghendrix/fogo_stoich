@@ -3,20 +3,19 @@
 ## I KNOW THIS LOOKS LIKE WAY TOO MUCH FOR ONE FUNCTION
 # but when I try to generate the stacked rasters separately, and then bring them into the model + prediction function, it keeps breaking. doing it all at once works, somehow
 
-predicted_map <- function(df, sp_key, r1, sdss_legend, r2, cfs_legend, r3, r4, r5, r6, r7, r8, r9) {
+predicted_single <- function(df, r1, sdss_legend, r2, cfs_legend, r3, r4, r5, r6, r7, r8, r9) {
 
-  df %<>% dplyr::filter(species == sp_key$species) %>%
+  
+  df %<>%
     mutate(sdss_lc = factor(sdss_lc),
            cfs_lc = factor(cfs_lc))
 
-  
   sdss_legend1 <- sdss_legend %>% dplyr::filter(label %in% df$sdss_lc) %>%
     mutate(label = factor(label)) %>%
     rename(sdss_lc = label)
   cfs_legend1 <- cfs_legend %>% dplyr::filter(label %in% df$cfs_lc) %>%
     mutate(label = factor(label)) %>%
     rename(cfs_lc = label)
-  
   
   # Convert all rasters to SpatRaster for terra:
   # sdss, cfs, ndvi, dem, slope, aspect, tpi, terrain, dist_to_coast
@@ -50,15 +49,51 @@ predicted_map <- function(df, sp_key, r1, sdss_legend, r2, cfs_legend, r3, r4, r
   
   df %<>% mutate(N = percent_N/100)
   
-  mod <- betareg(N ~ cfs_lc + sdss_lc + dist_to_coast + ndvi +
-               dem + slope + cos(aspect) + TPI + terrain, 
+  if(unique(df$species) == "Dwarf_birch") {
+  
+  mod <- betareg(N ~ sdss_lc + dist_to_coast + ndvi +
+               dem + slope + cos(aspect) + TPI, 
              data = df)
   
-  # This model works for most species, but not:
-  ## graminoid_spp. or Dwarf_birch
+  # apply the model to the stacked rasters
+  
+  r_pred <- terra::predict(layers, mod, na.rm = TRUE)
+  
+  pred_df <- as.data.frame(r_pred, xy = TRUE) %>%
+    mutate(percent_N = 100*lyr1) %>%
+    dplyr::select(-c(lyr1))
+  
+  # How to deal with outliers??? Censor everything to 6%, the max observed N
+  pred_df %<>% mutate(percent_N = ifelse(percent_N > 6, 6, percent_N))
   
   
-# apply the model to the stacked rasters
+  g <- ggplot(pred_df) +
+    # geom_sf(data = coast) +
+    geom_raster(aes(x = x, y = y, fill = percent_N)) +
+    coord_cartesian(ylim = c(5505000, 5515000)) +
+    xlab("") +
+    ylab("") +
+    scale_fill_viridis(option = "D", discrete = FALSE) +
+    ggtitle(paste0("Predicted %N for Dwarf_birch")) +
+    theme_bw() 
+  
+  ggsave(paste0('graphics/percent_N_Dwarf_birch.png'),
+         g,
+         height = 4,
+         width = 10)
+  
+  pred_df %<>%
+    rename_with(~paste("N_dwarf_birch"),
+                .cols = percent_N)
+  }
+  
+  else{
+    
+    mod <- betareg(N ~ cfs_lc + ndvi + dist_to_coast +
+                     TPI + terrain, 
+                   data = df)
+    
+  # apply the model to the stacked rasters
   
   r_pred <- terra::predict(layers, mod, na.rm = TRUE)
   
@@ -70,7 +105,6 @@ predicted_map <- function(df, sp_key, r1, sdss_legend, r2, cfs_legend, r3, r4, r
     pred_df %<>% mutate(percent_N = ifelse(percent_N > 6, 6, percent_N))
     
     
-    
  g <- ggplot(pred_df) +
    # geom_sf(data = coast) +
     geom_raster(aes(x = x, y = y, fill = percent_N)) +
@@ -78,18 +112,19 @@ predicted_map <- function(df, sp_key, r1, sdss_legend, r2, cfs_legend, r3, r4, r
     xlab("") +
     ylab("") +
     scale_fill_viridis(option = "D", discrete = FALSE) +
-    ggtitle(paste0("Predicted %N for ", sp_key$species)) +
+    ggtitle(paste0("Predicted %N for graminoid_spp.")) +
     theme_bw() 
 
-  ggsave(paste0('graphics/percent_N_', sp_key$species, '.png'),
+  ggsave(paste0('graphics/percent_N_graminoid_spp.png'),
                 g,
                 height = 4,
                 width = 10)
   
   pred_df %<>%
-    rename_with(~paste("percent_N_", sp_key$species),
+    rename_with(~paste("N_graminoid_spp"),
                 .cols = percent_N)
   
   return(pred_df)
+  }
 }
 
