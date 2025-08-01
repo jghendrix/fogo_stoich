@@ -394,6 +394,11 @@ targets_predict <- c(
     ),
   
   tar_target(
+    N_raster,
+    rasterise(N_by_cell)
+  ),
+  
+  tar_target(
     spp_dist,
     habitat_by_sp(data_cleaned)
 #  ),
