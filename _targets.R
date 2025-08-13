@@ -274,18 +274,12 @@ targets_models <- c(
                                        species != "Dwarf_birch"))
     [, tar_group := .GRP, by = c('species')], iteration = 'group'
     ),
-  
-  tar_target(
-    CN_prep,
-    as.data.table(subset(data_cleaned, species != "Moss"))
-  [, tar_group := .GRP, by = c('species')], iteration = 'group'
-  ),
 
     tar_target(
       sp_key,
       unique(sp_prep[, .SD, .SDcols = c("species", 'tar_group')])
     ),
-    
+
   tar_target(
     N_models,
     modelling(sp_prep, "percent_N"),
@@ -306,8 +300,8 @@ targets_models <- c(
   
   tar_target(
     CN_models,
-    modelling(CN_prep, "CN_ratio"),
-    map(CN_prep)
+    modelling(sp_prep, "CN_ratio"),
+    map(sp_prep)
   ),
   
   tar_target(
@@ -405,85 +399,68 @@ targets_predict <- c(
   ),
   
   tar_target(
-    spp_dist,
-    habitat_by_sp(data_cleaned)
-#  ),
-  
- # tar_target(
-#    seasonal_scatter,
-#    scatter_CN(sp_prep, winter)
- )
-  
-  
-)
-
-# Targets: bringing in caribou movement data ---------------------------
-targets_prep <- c(
-  
-  tar_target(
-    tidy_GPS,
-    GPS_tidying(caribou, ids)
+    CN_predictions,
+    ratio_predicted_map(sp_prep,
+                  sp_key, 
+                  sdss, 
+                  sdss_legend,
+                  cfs, 
+                  cfs_legend,
+                  ndvi, 
+                  dem, 
+                  slope, 
+                  aspect, 
+                  TPI,
+                  terrain,
+                  dist_to_coast),
+    pattern = map(sp_prep, sp_key)
   ),
+  
+  ## Birch and graminoid all failed to run for C:N ratio, exact same as %N
   tar_target(
-    locs_prep,
-    prepare_locs(tidy_GPS, id_col, datetime_col, tz, x_col, y_col, split_by),
-    iteration = 'group'
+    CN_birch,
+    ratio_predicted_single(birch_prep,
+                     sdss, 
+                     sdss_legend,
+                     cfs, 
+                     cfs_legend,
+                     ndvi, 
+                     dem, 
+                     slope, 
+                     aspect, 
+                     TPI,
+                     terrain,
+                     dist_to_coast)
   ),
+  
   tar_target(
-    split_key,
-    unique(locs_prep[, .SD, .SDcols = c(split_by, 'tar_group')])
+    CN_gram,
+    ratio_predicted_single(gram_prep,
+                     sdss, 
+                     sdss_legend,
+                     cfs, 
+                     cfs_legend,
+                     ndvi, 
+                     dem, 
+                     slope, 
+                     aspect, 
+                     TPI,
+                     terrain,
+                     dist_to_coast)
+  ),
+  
+  tar_target(
+    CN_by_cell,
+    ratio_predictions_by_cell(CN_predictions, CN_birch, CN_gram)
+  ),
+  
+  tar_target(
+    CN_raster,
+    rasterise(CN_by_cell)
   )
   
 )
 
-# Targets: tracks ---------------------------------------------------------
-targets_tracks <- c(
-  tar_target(
-    tracks,
-    make_track(locs_prep, x_, y_, t_, all_cols = TRUE, crs = 4326) |>
-      transform_coords(crs_to = crs),
-    pattern = map(locs_prep)
-  ),
-  tar_target(
-    tracks_resampled,
-    resample_tracks(tracks, rate = rate, tolerance = tolerance),
-    pattern = map(tracks)
-  ),
-  tar_target(
-    tracks_random,
-    random_steps(tracks_resampled, n = n_random_steps),
-    pattern = map(tracks_resampled)
-  )
-)
-## Extracting data for tracks ------------------------------
-
-targets_extract <- c(
-  tar_target(
-    tracks_extract,
-    extract_layers(
-      tracks_random,
-      crs,
-      cfs,
-      cfs_legend
-    )
-  ),
-  
-  tar_target(
-    tracks_stoich,
-    extract_stoich(
-      tracks_extract,
-      crs,
-      N_predictions
-    )
-  )
-
-  # Which layers do we really want as predictive surfaces for the iSSA?
-  ## lichen stoich
-  ## average vascular stoich?
-  ## average of which species? how to account for the negative/outrageous values? do we need to improve the distribution-by-spp first?
-  
-  
-  )
 # Targets: all ------------------------------------------------------------
 # Automatically grab and combine all the "targets_*" lists above
 lapply(grep('targets', ls(), value = TRUE), get)
