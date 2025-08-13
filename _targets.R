@@ -274,7 +274,13 @@ targets_models <- c(
                                        species != "Dwarf_birch"))
     [, tar_group := .GRP, by = c('species')], iteration = 'group'
     ),
-    
+  
+  tar_target(
+    CN_prep,
+    as.data.table(subset(data_cleaned, species != "Moss"))
+  [, tar_group := .GRP, by = c('species')], iteration = 'group'
+  ),
+
     tar_target(
       sp_key,
       unique(sp_prep[, .SD, .SDcols = c("species", 'tar_group')])
@@ -300,8 +306,8 @@ targets_models <- c(
   
   tar_target(
     CN_models,
-    modelling(sp_prep, "CN_ratio"),
-    map(sp_prep)
+    modelling(CN_prep, "CN_ratio"),
+    map(CN_prep)
   ),
   
   tar_target(

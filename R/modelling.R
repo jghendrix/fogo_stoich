@@ -6,7 +6,7 @@ modelling <- function(DT, response) {
   
   mod <- lm(as.formula(paste(response, 
                                "~ sdss_lc + cfs_lc + dist_to_coast + ndvi +
-                             dem + slope + cos(aspect) + TPI + terrain + pt_kernel")), 
+                             dem + slope + cos(aspect) + TPI + terrain")), 
               data = DT)
 }
 
