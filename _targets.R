@@ -395,7 +395,7 @@ targets_predict <- c(
   
   tar_target(
     N_raster,
-    rasterise(N_by_cell)
+    rasterise(N_by_cell, "N")
   ),
   
   tar_target(
@@ -456,7 +456,7 @@ targets_predict <- c(
   
   tar_target(
     CN_raster,
-    rasterise(CN_by_cell)
+    rasterise(CN_by_cell, "ratio")
   )
   
 )

@@ -77,7 +77,7 @@ ratio_predicted_single <- function(df, r1, sdss_legend, r2, cfs_legend, r3, r4, 
     ggtitle(paste0("Predicted C:N ratio for Dwarf_birch")) +
     theme_bw() 
   
-  ggsave(paste0('graphics/map/CN_ratio_Dwarf_birch.png'),
+  ggsave(paste0('graphics/maps/CN_ratio_Dwarf_birch.png'),
          g,
          height = 4,
          width = 10)
@@ -115,7 +115,7 @@ ratio_predicted_single <- function(df, r1, sdss_legend, r2, cfs_legend, r3, r4, 
     ggtitle(paste0("Predicted C:N ratio for graminoid_spp.")) +
     theme_bw() 
 
-  ggsave(paste0('graphics/CN_ratio_graminoid_spp.png'),
+  ggsave(paste0('graphics/maps/CN_ratio_graminoid_spp.png'),
                 g,
                 height = 4,
                 width = 10)
