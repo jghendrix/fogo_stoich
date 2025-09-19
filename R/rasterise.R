@@ -3,7 +3,7 @@ rasterise <- function(df, response){
 
 
   if(response == "N"){
- df$N_vascular <- rowMeans(subset(df, select = c(3:5, 7:11)), na.rm = T)
+ df$N_vascular <- rowMeans(subset(df, select = c(3:5, 7:10)), na.rm = T)
   
   write.csv(df, 'output/species_N_by_pixel.csv') 
   
@@ -18,7 +18,7 @@ rasterise <- function(df, response){
   }
   
   else{
-    df$CN_vascular <- rowMeans(subset(df, select = c(3:5, 7:11)), na.rm = T)
+    df$CN_vascular <- rowMeans(subset(df, select = c(3:5, 7:10)), na.rm = T)
     
     write.csv(df, 'output/species_CN_ratio_by_pixel.csv') 
     

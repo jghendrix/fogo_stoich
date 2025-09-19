@@ -259,6 +259,11 @@ tar_target(
 tar_target(
   data_cleaned,
   prepare_data(stoich, kerneled)
+),
+
+tar_target(
+  sp_plot,
+  scatter_CN(data_cleaned)
 )
 )
 
@@ -346,10 +351,10 @@ targets_predict <- c(
   pattern = map(sp_prep, sp_key)
   ),
   
-  tar_target(
-    gram_prep,
-    as.data.table(subset(data_cleaned, species == "graminoid_spp."))
-  ),
+#  tar_target(
+#    gram_prep,
+#    as.data.table(subset(data_cleaned, species == "graminoid_spp."))
+ # ),
   
   tar_target(
     birch_prep,
@@ -372,25 +377,27 @@ targets_predict <- c(
                   dist_to_coast)
   ),
   
-  tar_target(
-    N_gram,
-    predicted_single(gram_prep,
-                     sdss, 
-                     sdss_legend,
-                     cfs, 
-                     cfs_legend,
-                     ndvi, 
-                     dem, 
-                     slope, 
-                     aspect, 
-                     TPI,
-                     terrain,
-                     dist_to_coast)
-  ),
+#  tar_target(
+#    N_gram,
+#    predicted_single(gram_prep,
+#                     sdss, 
+#                     sdss_legend,
+#                     cfs, 
+#                     cfs_legend,
+#                     ndvi, 
+#                     dem, 
+#                     slope, 
+#                     aspect, 
+#                     TPI,
+#                     terrain,
+#                     dist_to_coast)
+#  ),
   
   tar_target(
       N_by_cell,
-      predictions_by_cell(N_predictions, N_birch, N_gram)
+      predictions_by_cell(N_predictions, N_birch
+                          #, N_gram
+                          )
     ),
   
   tar_target(

@@ -1,50 +1,31 @@
-scatter_CN <- function(DT, winter){
+scatter_CN <- function(DT){
   
   # all samples
   
-  forage$species <- relevel(forage$species, ref = "Cladonia")
+  DT %<>% filter(!species %in% c("Moss", "graminoid_spp.", "Black_spruce"))
   
-  ggplot(forage, aes(x = percent_C, y = percent_N, colour = species)) +
-    geom_point(alpha = 0.5) +
-    theme_bw() +
-    xlab("Percent C dry mass") +
-    ylab("Percent N dry mass") +
-    xlim(c(35, 60))
-  ggsave('graphics/allsppCN.png',
-         height = 6,
-         width = 8)
-  
-  DT <- forage %>% filter(run_number == "Dara")
+  DT$species <- relevel(DT$species, ref = "Cladonia")
   
   ggplot(DT, aes(x = percent_C, y = percent_N, colour = species)) +
-    geom_point(alpha = 0.6) +
+    geom_point(alpha = 0.5) +
+    scale_colour_viridis(discrete = TRUE, option = "B") +
     theme_bw() +
-    xlab("Percent C dry mass") +
-    ylab("Percent N dry mass") +
-    xlim(c(40, 80)) +
-    ylim(c(0, 5)) +
-    ggtitle("Summer C:N content")
-  
-  ggsave('graphics/summerCN.png',
-         height = 6,
+    xlab("Carbon (% dry mass)") +
+    ylab("Nitrogen (% dry mass)") +
+    xlim(c(35, 65))
+  ggsave('graphics/allsamplesCN.png',
+         height = 5,
          width = 8)
   
-  winter %<>% filter(species != "moss") %>%
-    mutate(species = as.factor(species))
-  winter$species <- relevel(winter$species, ref = "Cladonia")
+  sp_sum <- DT %>% group_by(species) %>%
+    summarise(n = n(),
+              xN = mean(percent_N, na.rm = T),
+              sdN = sd(percent_N, na.rm = T),
+              seN = sdN/sqrt(n),
+              xC = mean(percent_C, na.rm = T),
+              sdC = sd(percent_C, na.rm = T),
+              seC = sdC/sqrt(n))
   
-  ggplot(winter, aes(x = percent_C, y = percent_N, colour = species)) +
-    geom_point(alpha = 0.6) + 
-    theme_bw() +
-    xlim(c(40, 80)) +
-    ylim(c(0, 5)) +
-    xlab("Winter %C") +
-    ylab("Winter %N") +
-    ggtitle("Winter C:N content")
-  
-  ggsave('graphics/winterCN.png',
-         height = 6,
-         width = 8)
-  
-  
+  return(sp_sum)
+
 }

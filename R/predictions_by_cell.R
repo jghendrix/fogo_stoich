@@ -1,5 +1,5 @@
 
-predictions_by_cell <- function(df, birch, gram){
+predictions_by_cell <- function(df, birch){
 
   # mapping across all the species, the predictions are rbind() together into 53 million rows, with a bunch of NAs in every column except the focal species. Ideally we could avoid a 53 million row df and just cbind() the mapped targets but I don't know how to do that
   # so this is my very inefficient workaround
@@ -14,7 +14,7 @@ predictions_by_cell <- function(df, birch, gram){
             N_deergrass = mean(`percent_N_ Deergrass`, na.rm = T))
 
   df2 <- left_join(df1, birch, by = c("x", "y"))
-  df2 <- left_join(df2, gram, by = c("x", "y"))
+  #df2 <- left_join(df2, gram, by = c("x", "y"))
   
   df2$N_crowberry <- gsub("NaN", NA, df2$N_crowberry)
   df2$N_Kalmia <- gsub("NaN", NA, df2$N_Kalmia)
@@ -24,7 +24,7 @@ predictions_by_cell <- function(df, birch, gram){
   df2$N_alder <- gsub("NaN", NA, df2$N_alder)
   df2$N_dwarf_birch <- gsub("NaN", NA, df2$N_dwarf_birch)    
   df2$N_deergrass <- gsub("NaN", NA, df2$N_deergrass)
-  df2$N_graminoid_spp <- gsub("NaN", NA, df2$N_graminoid_spp)
+  #df2$N_graminoid_spp <- gsub("NaN", NA, df2$N_graminoid_spp)
 
   df2 %<>% mutate_if(is.character, as.numeric)
 }
