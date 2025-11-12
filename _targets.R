@@ -303,6 +303,8 @@ targets_models <- c(
     pattern = map(N_models, sp_key)
   ),
   
+ ### Ratio models ----
+ 
   tar_target(
     CN_models,
     modelling(sp_prep, "CN_ratio"),
@@ -319,6 +321,26 @@ targets_models <- c(
    CN_coef,
    output_by_sp(CN_models, sp_key),
    pattern = map(CN_models, sp_key)
+ ),
+ 
+ ### Carbon alone models ----
+ 
+ tar_target(
+   C_models,
+   modelling(sp_prep, "percent_C"),
+   map(sp_prep)
+ ),
+ 
+ tar_target(
+   C_sum,
+   summarise_model(C_models, sp_prep),
+   map(C_models, sp_prep)
+ ),
+ 
+ tar_target(
+   C_coef,
+   output_by_sp(C_models, sp_key),
+   pattern = map(C_models, sp_key)
  )
 )
 
@@ -464,7 +486,28 @@ targets_predict <- c(
   tar_target(
     CN_raster,
     rasterise(CN_by_cell, "ratio")
-  )
+  ),
+
+
+  # Percent carbon maps?
+tar_target(
+  C_predictions,
+  predicted_C_map(sp_prep,
+                sp_key, 
+                sdss, 
+                sdss_legend,
+                cfs, 
+                cfs_legend,
+                ndvi, 
+                dem, 
+                slope, 
+                aspect, 
+                TPI,
+                terrain,
+                dist_to_coast),
+  pattern = map(sp_prep, sp_key)
+)
+
   
 )
 
