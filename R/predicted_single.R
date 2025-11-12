@@ -77,9 +77,9 @@ predicted_single <- function(df, r1, sdss_legend, r2, cfs_legend, r3, r4, r5, r6
     ggtitle(paste0("Predicted %N for Dwarf_birch")) +
     theme_bw() 
   
-  ggsave(paste0('graphics/percent_N_Dwarf_birch.png'),
+  ggsave(paste0('graphics/stoich_layers/percent_N_Dwarf_birch.png'),
          g,
-         height = 4,
+         height = 5,
          width = 10)
   
   pred_df %<>%
@@ -115,9 +115,9 @@ predicted_single <- function(df, r1, sdss_legend, r2, cfs_legend, r3, r4, r5, r6
     ggtitle(paste0("Predicted %N for graminoid_spp.")) +
     theme_bw() 
 
-  ggsave(paste0('graphics/percent_N_graminoid_spp.png'),
+  ggsave(paste0('graphics/stoich_layers/percent_N_graminoid_spp.png'),
                 g,
-                height = 4,
+                height = 5,
                 width = 10)
   
   pred_df %<>%

@@ -83,7 +83,7 @@ predicted_map <- function(df, sp_key, r1, sdss_legend, r2, cfs_legend, r3, r4, r
 
   ggsave(paste0('graphics/stoich_layers/percent_N_', sp_key$species, '.png'),
                 g,
-                height = 4,
+                height = 5,
                 width = 10)
   
   pred_df %<>%
