@@ -7,7 +7,8 @@ ratio_predicted_map <- function(df, sp_key, r1, sdss_legend, r2, cfs_legend, r3,
 
   df %<>% dplyr::filter(species == sp_key$species) %>%
     mutate(sdss_lc = factor(sdss_lc),
-           cfs_lc = factor(cfs_lc))
+           cfs_lc = factor(cfs_lc)) %>%
+    filter(percent_C > 10 & percent_C < 100)
 
   
   sdss_legend1 <- sdss_legend %>% dplyr::filter(label %in% df$sdss_lc) %>%
@@ -75,16 +76,16 @@ ratio_predicted_map <- function(df, sp_key, r1, sdss_legend, r2, cfs_legend, r3,
  g <- ggplot(pred_df) +
    # geom_sf(data = coast) +
     geom_raster(aes(x = x, y = y, fill = CN_ratio)) +
-    coord_cartesian(ylim = c(5505000, 5515000)) +
+    coord_cartesian(ylim = c(5503000, 5515000)) +
     xlab("") +
     ylab("") +
     scale_fill_viridis(option = "D", discrete = FALSE) +
     ggtitle(paste0("Predicted C:N ratio for ", sp_key$species)) +
     theme_bw() 
 
-  ggsave(paste0('graphics/maps/CN_ratio_', sp_key$species, '.png'),
+  ggsave(paste0('graphics/stoich_layers/CN_ratio_', sp_key$species, '.png'),
                 g,
-                height = 4,
+                height = 5,
                 width = 10)
   
   pred_df %<>%

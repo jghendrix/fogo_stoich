@@ -70,7 +70,7 @@ predicted_single <- function(df, r1, sdss_legend, r2, cfs_legend, r3, r4, r5, r6
   g <- ggplot(pred_df) +
     # geom_sf(data = coast) +
     geom_raster(aes(x = x, y = y, fill = percent_N)) +
-    coord_cartesian(ylim = c(5505000, 5515000)) +
+    coord_cartesian(ylim = c(5503000, 5515000)) +
     xlab("") +
     ylab("") +
     scale_fill_viridis(option = "D", discrete = FALSE) +
