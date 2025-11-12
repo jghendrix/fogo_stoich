@@ -398,28 +398,10 @@ targets_predict <- c(
                   terrain,
                   dist_to_coast)
   ),
-  
-#  tar_target(
-#    N_gram,
-#    predicted_single(gram_prep,
-#                     sdss, 
-#                     sdss_legend,
-#                     cfs, 
-#                     cfs_legend,
-#                     ndvi, 
-#                     dem, 
-#                     slope, 
-#                     aspect, 
-#                     TPI,
-#                     terrain,
-#                     dist_to_coast)
-#  ),
-  
+
   tar_target(
       N_by_cell,
-      predictions_by_cell(N_predictions, N_birch
-                          #, N_gram
-                          )
+      predictions_by_cell(N_predictions, N_birch)
     ),
   
   tar_target(
@@ -462,25 +444,10 @@ targets_predict <- c(
                      dist_to_coast)
   ),
   
-  tar_target(
-    CN_gram,
-    ratio_predicted_single(gram_prep,
-                     sdss, 
-                     sdss_legend,
-                     cfs, 
-                     cfs_legend,
-                     ndvi, 
-                     dem, 
-                     slope, 
-                     aspect, 
-                     TPI,
-                     terrain,
-                     dist_to_coast)
-  ),
   
   tar_target(
     CN_by_cell,
-    ratio_predictions_by_cell(CN_predictions, CN_birch, CN_gram)
+    ratio_predictions_by_cell(CN_predictions, CN_birch)
   ),
   
   tar_target(
@@ -489,7 +456,7 @@ targets_predict <- c(
   ),
 
 
-  # Percent carbon maps?
+  ### Percent carbon maps? -----
 tar_target(
   C_predictions,
   predicted_C_map(sp_prep,
@@ -506,6 +473,22 @@ tar_target(
                 terrain,
                 dist_to_coast),
   pattern = map(sp_prep, sp_key)
+),
+
+tar_target(
+  C_birch,
+  predicted_single_C(birch_prep,
+                   sdss, 
+                   sdss_legend,
+                   cfs, 
+                   cfs_legend,
+                   ndvi, 
+                   dem, 
+                   slope, 
+                   aspect, 
+                   TPI,
+                   terrain,
+                   dist_to_coast)
 )
 
   

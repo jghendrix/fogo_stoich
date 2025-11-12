@@ -7,7 +7,8 @@ predicted_C_map <- function(df, sp_key, r1, sdss_legend, r2, cfs_legend, r3, r4,
 
   df %<>% dplyr::filter(species == sp_key$species) %>%
     mutate(sdss_lc = factor(sdss_lc),
-           cfs_lc = factor(cfs_lc))
+           cfs_lc = factor(cfs_lc)) %>%
+    filter(percent_C < 100 & percent_C > 10)
 
   
   sdss_legend1 <- sdss_legend %>% dplyr::filter(label %in% df$sdss_lc) %>%
@@ -54,8 +55,8 @@ predicted_C_map <- function(df, sp_key, r1, sdss_legend, r2, cfs_legend, r3, r4,
                dem + slope + cos(aspect) + TPI + terrain, 
              data = df)
   
-  # This model works for most species, but not:
-  ## graminoid_spp. or Dwarf_birch
+  summary(mod)
+  # This model works for most species, but for Dwarf_birch need to remove cfs_lc
   
   
 # apply the model to the stacked rasters
@@ -73,22 +74,22 @@ predicted_C_map <- function(df, sp_key, r1, sdss_legend, r2, cfs_legend, r3, r4,
     
  g <- ggplot(pred_df) +
    # geom_sf(data = coast) +
-    geom_raster(aes(x = x, y = y, fill = percent_N)) +
-    coord_cartesian(ylim = c(5505000, 5515000)) +
+    geom_raster(aes(x = x, y = y, fill = percent_C)) +
+    coord_cartesian(ylim = c(5503000, 5515000)) +
     xlab("") +
     ylab("") +
     scale_fill_viridis(option = "D", discrete = FALSE) +
-    ggtitle(paste0("Predicted %N for ", sp_key$species)) +
+    ggtitle(paste0("Predicted %C for ", sp_key$species)) +
     theme_bw() 
 
-  ggsave(paste0('graphics/percent_N_', sp_key$species, '.png'),
+  ggsave(paste0('graphics/stoich_layers/percent_C_', sp_key$species, '.png'),
                 g,
                 height = 4,
                 width = 10)
   
   pred_df %<>%
-    rename_with(~paste("percent_N_", sp_key$species),
-                .cols = percent_N)
+    rename_with(~paste("percent_C_", sp_key$species),
+                .cols = percent_C)
   
   return(pred_df)
 }
