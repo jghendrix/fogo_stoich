@@ -264,6 +264,11 @@ tar_target(
 tar_target(
   sp_plot,
   scatter_CN(data_cleaned)
+),
+
+tar_target(
+  seasonal_comp,
+  winter_comp(data_cleaned, winter)
 )
 )
 
@@ -493,6 +498,7 @@ tar_target(
 
   
 )
+
 
 # Targets: all ------------------------------------------------------------
 # Automatically grab and combine all the "targets_*" lists above
