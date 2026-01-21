@@ -14,8 +14,4 @@ modelling <- function(DT, response) {
 # this is all caribou fixes ever, though... perhaps if restricted to just winter, a different story?
 # or can we calculate an intensity of use that isn't quite so zero-centred?
 
-# adding count of caribou fixes in 25m x 25m cell does not do anything explanatory in the model
-# this is all caribou fixes ever, though... perhaps if restricted to just winter, a different story?
-# or can we calculate an intensity of use that isn't quite so zero-centred?
-
 ## REMOVE CARIBOU FOR NOW SO WE CAN USE AS PREDICTOR IN ISSA

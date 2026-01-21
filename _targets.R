@@ -1,4 +1,4 @@
-# === Targets: Fogo stoich mapping ----------------------
+# === Targets: Fogo StDM----------------------
 # Jack G Hendrix
 # 24 February 2025
 
@@ -47,27 +47,10 @@ epsg <- 32621
 crs <- st_crs(epsg)
 crs_sp <- CRS(crs$wkt)
 
-
-
-id_col <- 'Animal_ID'
 datetime_col <- 'datetime'
 x_col <- 'x_long'
 y_col <- 'y_lat'
 tz <- 'America/St_Johns'
-
-# Split by: within which column or set of columns (eg. c(id, yr))
-#  do we want to split our analysis?
-split_by <- id_col
-seasonal_split <- "season"
-
-# For iSSA tracks:
-# Resampling rate
-rate <- minutes(120)
-# Tolerance
-tolerance <- minutes(5)
-# Number of random steps
-n_random_steps <- 10
-
 
 # Targets: data -----------------------------------------------------------
 targets_data <- c(
@@ -378,11 +361,6 @@ targets_predict <- c(
   pattern = map(sp_prep, sp_key)
   ),
   
-#  tar_target(
-#    gram_prep,
-#    as.data.table(subset(data_cleaned, species == "graminoid_spp."))
- # ),
-  
   tar_target(
     birch_prep,
     as.data.table(subset(data_cleaned, species == "Dwarf_birch"))
@@ -448,7 +426,6 @@ targets_predict <- c(
                      terrain,
                      dist_to_coast)
   ),
-  
   
   tar_target(
     CN_by_cell,
