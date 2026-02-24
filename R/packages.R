@@ -11,7 +11,7 @@ conflicts_prefer(raster::extract)
 library(data.table)
 library(lme4)
 
-library(amt)
+#library(amt)
 library(sf)
 library(raster)
 library(parsedate)

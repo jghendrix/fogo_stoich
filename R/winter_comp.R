@@ -1,5 +1,6 @@
 winter_comp <- function(DT, winter){
   
+  # Subset to the sites where we returned overwinter and the species we collected during winter
   DT %<>% filter(run_number == "Dara" &
                    !species %in% c("Moss", "graminoid_spp.", "Black_spruce"))
   
@@ -16,26 +17,7 @@ winter_comp <- function(DT, winter){
               rse = sd(percent_C/percent_N)/sqrt(number)
               )
   
-  # summer C & N averages -----
-  ggplot(summer, aes(x = C, xmin = C - Cse, xmax = C + Cse,
-                     y = N, ymin = N - Nse, ymax = N + Nse,
-                     colour = species)) +
-    geom_point() +
-    geom_errorbar(width = 0.2) +
-    geom_errorbarh(height = 0.05) +
-    scale_colour_viridis(discrete = TRUE, option = "B", end = 0.9) +
-    theme_bw() +
-    xlab("Percent C dry mass") +
-    ylab("Percent N dry mass") +
-    #xlim(c(40, 80)) +
-    #ylim(c(0, 5)) +
-    ggtitle("Summer C:N content")
-  
-  ggsave('graphics/seasonal/summer_avg_CN.png',
-         height = 4,
-         width = 6)
-  
-  # winter C & N averages -----
+ # winter C & N averages -----
   winter %<>% filter(species != "moss") %>%
     mutate(species = as.factor(species))
   winter$species <- relevel(winter$species, ref = "Cladonia")
@@ -69,15 +51,12 @@ winter_comp <- function(DT, winter){
          height = 4,
          width = 6)
   
-  
-  # seasonal comparison -----
+    # seasonal comparison -----
   
   wint_sum %<>% mutate(season = 1)
   summer %<>% mutate(season = 0)
   
   seas <- rbind(wint_sum, summer)
-  
-  
   
   ggplot(seas, aes(x = season, y = N, 
                    ymin = N - Nse, ymax = N + Nse,
@@ -137,25 +116,5 @@ winter_comp <- function(DT, winter){
   ggsave('graphics/seasonal/change_in_ratio_seasonal.png',
          height = 4,
          width = 6)
-  
-  
-  
-  
-  
-  # Is it better with just raw values in boxplots?
-  
-  sum_all <- DT %>% dplyr::select(c(species, percent_N)) %>%
-    mutate(season = "summer")
-  
-  wint_all <- winter %>% dplyr::select(c(species, percent_N)) %>%
-    mutate(season = "winter")
-  
-  allsamp <- rbind(sum_all, wint_all)
-  
-  ggplot(allsamp, aes(x = season, y = percent_N, colour = species)) +
-    geom_boxplot() +
-    theme_bw() +
-    scale_colour_viridis(discrete = TRUE, option = "B", end = 0.9)
-  
   
 }

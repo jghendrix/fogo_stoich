@@ -1,4 +1,4 @@
-# === Targets: Fogo stoich mapping ----------------------
+# === Targets: Fogo StDM----------------------
 # Jack G Hendrix
 # 24 February 2025
 
@@ -27,14 +27,10 @@ slope_path <- file.path('input', 'slope.tif')
 aspect_path <- file.path('input', 'aspect.tif')
 TPI_path <- file.path('input', 'TPI.tif')
 terrain_path <- file.path('input', 'terrain.tif')
-kernel_path <- file.path('input', 'kernel.tif')
 
-# rasterized distance to coast
+# rasterized distance to coast layer
 dist_to_coast_path <- file.path('input', 'dist_to_coast.tif')
 
-# Caribou data path
-gps_path <- file.path('output', 'all_Fogo_caribou_locs_20June2025.csv')
-id_path <- file.path('output', 'collar-animal-ids.csv')
 
 # Variables ---------------------------------------------------------------
 bb <- c(
@@ -43,31 +39,9 @@ bb <- c(
 	xmax = -53.954220,
 	ymax = 49.763834
 )
+
 epsg <- 32621
 crs <- st_crs(epsg)
-crs_sp <- CRS(crs$wkt)
-
-
-
-id_col <- 'Animal_ID'
-datetime_col <- 'datetime'
-x_col <- 'x_long'
-y_col <- 'y_lat'
-tz <- 'America/St_Johns'
-
-# Split by: within which column or set of columns (eg. c(id, yr))
-#  do we want to split our analysis?
-split_by <- id_col
-seasonal_split <- "season"
-
-# For iSSA tracks:
-# Resampling rate
-rate <- minutes(120)
-# Tolerance
-tolerance <- minutes(5)
-# Number of random steps
-n_random_steps <- 10
-
 
 # Targets: data -----------------------------------------------------------
 targets_data <- c(
@@ -80,18 +54,6 @@ targets_data <- c(
 	tar_file_read(
 	  winter,
 	  winter_path,
-	  fread(!!.x)
-	),
-	
-	tar_file_read(
-	  caribou,
-	  gps_path,
-	  fread(!!.x)
-	),
-	
-	tar_file_read(
-	  ids,
-	  id_path,
 	  fread(!!.x)
 	),
 	
@@ -151,26 +113,10 @@ targets_data <- c(
 	  terrain_path,
 	  raster(!!.x)
 	),
-	tar_file_read(
-	  kernel,
-	  kernel_path,
-	  raster(!!.x)
-	),
 	
 	tar_target(
-		coast,
-		get_coastline(bb, crs)
-		),
-
-	tar_target(
-		roads,
-		get_roads(bb, crs)
-	),
-	tar_target(
-		water,
-		get_lakes(bb, crs)
-	)
-	
+	  coast,
+	  get_coastline(bb, crs))
 )
 
 
@@ -199,18 +145,10 @@ tar_target(
   sites_to_coast %>% dplyr::rename(dist_to_coast = dist_to_feat_line)
 ),
 
-tar_target(
-	sites_to_roads,
-	dist_to_feature(
-		renamed_coast,
-		crs,
-		roads
-	)
-),
 
 tar_target(
   sdss_sites,
-  extract_lc(sites_to_roads, 
+  extract_lc(renamed_coast, 
              crs, 
              sdss, 
              sdss_legend)
@@ -246,31 +184,23 @@ tar_target(
     TPI,
     terrain
   )
-),
+))
 
-tar_target(
-  kerneled,
-  extract_kernel(
-    raster_ext,
-    crs,
-    kernel)
-),
+# tar_target(
+#   data_cleaned,
+#   prepare_data(stoich, raster_ext)
+# ),
 
-tar_target(
-  data_cleaned,
-  prepare_data(stoich, kerneled)
-),
-
-tar_target(
-  sp_plot,
-  scatter_CN(data_cleaned)
-),
-
-tar_target(
-  seasonal_comp,
-  winter_comp(data_cleaned, winter)
-)
-)
+# tar_target(
+#   sp_plot,
+#   scatter_CN(data_cleaned)
+# ),
+# 
+# tar_target(
+#   seasonal_comp,
+#   winter_comp(data_cleaned, winter)
+# )
+# )
 
 # Targets: explanatory models -------------------------------------------------------
 
@@ -306,59 +236,21 @@ targets_models <- c(
   N_coef,
     output_by_sp(N_models, sp_key),
     pattern = map(N_models, sp_key)
-  ),
-  
- ### Ratio models ----
- 
-  tar_target(
-    CN_models,
-    modelling(sp_prep, "CN_ratio"),
-    map(sp_prep)
-  ),
-  
-  tar_target(
-    CN_sum,
-    summarise_model(CN_models, sp_prep),
-    map(CN_models, sp_prep)
-  ),
- 
- tar_target(
-   CN_coef,
-   output_by_sp(CN_models, sp_key),
-   pattern = map(CN_models, sp_key)
- ),
- 
- ### Carbon alone models ----
- 
- tar_target(
-   C_models,
-   modelling(sp_prep, "percent_C"),
-   map(sp_prep)
- ),
- 
- tar_target(
-   C_sum,
-   summarise_model(C_models, sp_prep),
-   map(C_models, sp_prep)
- ),
- 
- tar_target(
-   C_coef,
-   output_by_sp(C_models, sp_key),
-   pattern = map(C_models, sp_key)
- )
+  )
 )
 
 # Targets: predicting N across rest of island ---------------------------
 targets_predict <- c(
 
+  # distance to coast needs to be a raster to project across
   tar_file_read(
     dist_to_coast,
     dist_to_coast_path,
     raster(!!.x)
   ),
-  # We can't apply the same predictive model to graminoid or birch, it breaks
-  # separate these out and run separately?
+  
+  # We can't apply the same predictive model to dwarf_birch, it fails to convege
+  # so look at the rest of the species separately and then combine at end
   
   tar_target(
     N_predictions,
@@ -377,11 +269,6 @@ targets_predict <- c(
                   dist_to_coast),
   pattern = map(sp_prep, sp_key)
   ),
-  
-#  tar_target(
-#    gram_prep,
-#    as.data.table(subset(data_cleaned, species == "graminoid_spp."))
- # ),
   
   tar_target(
     birch_prep,
@@ -412,27 +299,49 @@ targets_predict <- c(
   tar_target(
     N_raster,
     rasterise(N_by_cell, "N")
+  )
+)
+  
+  
+  ### For supplement: Ratio models ----
+targets_supplement <- c(
+   
+  tar_target(
+    CN_models,
+    modelling(sp_prep, "CN_ratio"),
+    map(sp_prep)
+  ),
+  
+  tar_target(
+    CN_sum,
+    summarise_model(CN_models, sp_prep),
+    map(CN_models, sp_prep)
+  ),
+  
+  tar_target(
+    CN_coef,
+    output_by_sp(CN_models, sp_key),
+    pattern = map(CN_models, sp_key)
   ),
   
   tar_target(
     CN_predictions,
     ratio_predicted_map(sp_prep,
-                  sp_key, 
-                  sdss, 
-                  sdss_legend,
-                  cfs, 
-                  cfs_legend,
-                  ndvi, 
-                  dem, 
-                  slope, 
-                  aspect, 
-                  TPI,
-                  terrain,
-                  dist_to_coast),
+                        sp_key, 
+                        sdss, 
+                        sdss_legend,
+                        cfs, 
+                        cfs_legend,
+                        ndvi, 
+                        dem, 
+                        slope, 
+                        aspect, 
+                        TPI,
+                        terrain,
+                        dist_to_coast),
     pattern = map(sp_prep, sp_key)
   ),
   
-  ## Birch and graminoid all failed to run for C:N ratio, exact same as %N
   tar_target(
     CN_birch,
     ratio_predicted_single(birch_prep,
@@ -449,7 +358,6 @@ targets_predict <- c(
                      dist_to_coast)
   ),
   
-  
   tar_target(
     CN_by_cell,
     ratio_predictions_by_cell(CN_predictions, CN_birch)
@@ -459,9 +367,27 @@ targets_predict <- c(
     CN_raster,
     rasterise(CN_by_cell, "ratio")
   ),
-
-
-  ### Percent carbon maps? -----
+  
+  ### For supplement: Carbon alone models ----
+  
+  tar_target(
+    C_models,
+    modelling(sp_prep, "percent_C"),
+    map(sp_prep)
+  ),
+  
+  tar_target(
+    C_sum,
+    summarise_model(C_models, sp_prep),
+    map(C_models, sp_prep)
+  ),
+  
+  tar_target(
+    C_coef,
+    output_by_sp(C_models, sp_key),
+    pattern = map(C_models, sp_key)
+  ),
+  
 tar_target(
   C_predictions,
   predicted_C_map(sp_prep,
@@ -495,11 +421,7 @@ tar_target(
                    terrain,
                    dist_to_coast)
 )
-
-  
 )
-
-
 # Targets: all ------------------------------------------------------------
 # Automatically grab and combine all the "targets_*" lists above
 lapply(grep('targets', ls(), value = TRUE), get)
