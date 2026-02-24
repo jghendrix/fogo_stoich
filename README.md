@@ -1,2 +1,1 @@
-# stoich
-
+Code and minimum input data required to recreate stoichiometric distribution models (StDM) for caribou forage species on Fogo Island. Preprint available ____

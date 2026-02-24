@@ -12,8 +12,8 @@ rasterise <- function(df, response){
   clad <- rasterFromXYZ(cladonia)
   vasc <- rasterFromXYZ(vascular)
   
-  terra::writeRaster(clad, "output/Cladonia_N.tif", filetype = "GTiff")
-  terra::writeRaster(vasc, "output/Vascular_N.tif", filetype = "GTiff")
+  terra::writeRaster(clad, "output/Cladonia_Nrast.tif", filetype = "GTiff", overwrite = TRUE)
+  terra::writeRaster(vasc, "output/Vascular_Nrast.tif", filetype = "GTiff", overwrite = TRUE)
   
   }
   
@@ -27,8 +27,8 @@ rasterise <- function(df, response){
     clad <- rasterFromXYZ(cladonia)
     vasc <- rasterFromXYZ(vascular)
     
-    terra::writeRaster(clad, "output/Cladonia_CN.tif", filetype = "GTiff")
-    terra::writeRaster(vasc, "output/Vascular_CN.tif", filetype = "GTiff")
+    terra::writeRaster(clad, "output/Cladonia_CNratio.tif", filetype = "GTiff", overwrite = TRUE)
+    terra::writeRaster(vasc, "output/Vascular_CNratio.tif", filetype = "GTiff", overwrite = TRUE)
     
   }
     

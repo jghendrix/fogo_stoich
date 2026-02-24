@@ -1,9 +1,7 @@
-.Rproj.user
-.Rhistory
-.RData
-.Ruserdata
-input
-_targets
-graphics
-output
-other-scripts
+.Rproj.user/
+.Rhistory/
+.RData/
+.Ruserdata/
+_targets/
+graphics/
+output/
