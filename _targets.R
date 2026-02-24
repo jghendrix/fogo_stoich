@@ -186,22 +186,6 @@ tar_target(
   )
 ))
 
-# tar_target(
-#   data_cleaned,
-#   prepare_data(stoich, raster_ext)
-# ),
-
-# tar_target(
-#   sp_plot,
-#   scatter_CN(data_cleaned)
-# ),
-# 
-# tar_target(
-#   seasonal_comp,
-#   winter_comp(data_cleaned, winter)
-# )
-# )
-
 # Targets: explanatory models -------------------------------------------------------
 
 targets_models <- c(
