@@ -184,7 +184,13 @@ tar_target(
     TPI,
     terrain
   )
-))
+),
+
+tar_target(
+  data_cleaned,
+  prepare_data(stoich, raster_ext)
+)
+)
 
 # Targets: explanatory models -------------------------------------------------------
 
